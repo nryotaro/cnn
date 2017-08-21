@@ -37,5 +37,5 @@ class Vectorizer(object):
         return np.concatenate((matrix, pad), axis=0)
 
     def vectorize(self, txt):
-        return self._padding(
-            self._to_word_matrix(self._to_alphabet_word_list(txt)))
+        ary = np.array(self._to_word_matrix(self._to_alphabet_word_list(txt)))
+        return self._padding(ary)
