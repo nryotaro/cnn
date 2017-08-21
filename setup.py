@@ -15,7 +15,7 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Programming Language :: Python :: 3.6'],
     packages=find_packages(exclude=['tests']),
-    install_requires=['tensorflow', 'gensim'],
+    install_requires=['tensorflow', 'gensim', 'nltk'],
     python_requires='>=3.6.1',
     extras_require={'dev': ['pytest', 'jupyter']},
     entry_points={
