@@ -11,8 +11,7 @@ class TestVectorizer(object):
         words = vec._to_alphabet_word_list(
             'The quick brown fox jumps over the lazy dog ! あ')
 
-        assert words == ['the', 'quick', 'brown', 'fox', 'jumps',
-                         'over', 'the', 'lazy', 'dog']
+        assert words == ['quick', 'brown', 'fox', 'jumps', 'lazy', 'dog']
 
     def test__to_word_matrix(self):
         m = {'the': [1, 2, 3], 'quick': [4, 5, 6], 'fox': [7, 8, 9]}
@@ -44,7 +43,3 @@ class TestVectorizer(object):
             np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
 
         assert (a == np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])).all()
-
-    """
-    TODO Measure mean and std of padding data
-    """

@@ -2,9 +2,11 @@
 import re
 import numpy as np
 from nltk.tokenize import TweetTokenizer
+from hello_cnn.stop_words import stop_words
 
 
 class Vectorizer(object):
+
     def __init__(self, model, length=1000, tokenizer=TweetTokenizer(),
                  alphabet_pattern=re.compile('^[a-zA-Z]+$')):
         self.model = model
@@ -14,7 +16,8 @@ class Vectorizer(object):
 
     def _to_alphabet_word_list(self, txt):
         return list((word.lower() for word in self.tokenizer.tokenize(txt)
-                     if self.alphabet_pattern.match(word)))
+                     if self.alphabet_pattern.match(word)
+                     and word.lower() not in stop_words))
 
     def _to_word_matrix(self, words):
         vectorizable_words = list(filter(
