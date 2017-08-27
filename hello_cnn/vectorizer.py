@@ -7,7 +7,7 @@ from hello_cnn.stop_words import stop_words
 
 class Vectorizer(object):
 
-    def __init__(self, model, length=1000, tokenizer=TweetTokenizer(),
+    def __init__(self, model, length=200, tokenizer=TweetTokenizer(),
                  alphabet_pattern=re.compile('^[a-zA-Z]+$')):
         self.model = model
         self.tokenizer = tokenizer
