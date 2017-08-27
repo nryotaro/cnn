@@ -42,3 +42,7 @@ class Vectorizer(object):
     def vectorize(self, txt):
         ary = np.array(self._to_word_matrix(self._to_alphabet_word_list(txt)))
         return self._padding(ary)
+
+
+def build_vectorizer(model_path):
+    return Vectorizer(model_path)

@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
+import hello_cnn.embed_factory as fac
+import hello_cnn.vectorizer as vec
 import tensorflow as tf
 import os
 import time
 import datetime
+import pandas as pd
 
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer(
+    "num_epochs", 200,
+    "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer(
     "evaluate_every", 100,
     "Evaluate model on dev set after this many steps (default: 100)")
@@ -23,9 +29,32 @@ tf.flags.DEFINE_boolean(
 tf.flags.DEFINE_boolean(
     "log_device_placement", False,
     "Log placement of ops on devices")
+tf.flags.DEFINE_boolean(
+    "log_device_placement", False,
+    "Log placement of ops on devices")
+tf.flags.DEFINE_string(
+    "w2v_model", '../data/GoogleNews-vectors-negative300.bin',
+    "The path of a Word2Vec model")
+tf.flags.DEFINE_string(
+    "train_data", '../data/train.csv',
+    "a csv file of training data")
+tf.flags.DEFINE_string(
+    "test_data", '../data/test.csv',
+    "a csv file for test")
+
 
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
+
+
+embed_factory = fac.EmbedFactory(
+    vec.build_vectorizer(FLAGS.v2v_model))
+
+
+def create_epoc_batch(src, batch_size, num_epochs):
+    for _ in range(num_epochs):
+        for batch_df in embed_factory.create_batch_gen(src, batch_size):
+            yield batch_df
 
 
 class Cnn(object):
@@ -43,7 +72,14 @@ class Cnn(object):
         pass
 
 
+def read_test_data(src):
+    df = pd.read_csv(src)
+    return df.iloc[:, 2:], df.iloc[:, 1]
+
+
 def train():
+    x_test, y_test = read_test_data(FLAGS.test_data)
+
     with tf.Graph().as_default():
 
         session_conf = tf.ConfigProto(
@@ -171,17 +207,17 @@ def train():
                     writer.add_summary(summaries, step)
 
             # Generate batches
-            batches = data_helpers.batch_iter(
-                list(zip(x_train, y_train)),
-                FLAGS.batch_size, FLAGS.num_epochs)
             # Training loop. For each batch...
-            for batch in batches:
-                x_batch, y_batch = zip(*batch)
+            for batch in create_epoc_batch(FLAGS.create_epoc_batch(
+                    FLAGS.train_data,
+                    FLAGS.batch_size,
+                    FLAGS.num_epochs)):
+                x_batch, y_batch = batch.iloc[:, 2:], batch.iloc[:, 1]
                 train_step(x_batch, y_batch)
                 current_step = tf.train.global_step(sess, global_step)
                 if current_step % FLAGS.evaluate_every == 0:
                     print("\nEvaluation:")
-                    dev_step(x_dev, y_dev, writer=dev_summary_writer)
+                    dev_step(x_test, y_test, writer=dev_summary_writer)
                     print("")
                     if current_step % FLAGS.checkpoint_every == 0:
                         # checkpoint_prefix: save destination
