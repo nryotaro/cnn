@@ -1,32 +1,38 @@
 # -*- coding: utf-8 -*-
-from hello_cnn.embed_factory import create_batch_gen, _count_txt_file_lines
+from hello_cnn.embed_factory import EmbedFactory
 from io import StringIO
 import os
-from unittest.mock import patch 
+import pandas as pd
+from unittest.mock import MagicMock
 
 
-txt = StringIO(
-    ('test_data\n'
-     '0\n'
-     '1\n'
-     '2\n'
-     '3\n'
-     '4\n'
-     '5\n'
-     '6\n'
-     '7\n'
-     '8\n'
-     '9\n'))
+class TestEmbedFactory(object):
 
+    def test__count_txt_file_lines(self):
+        txt = StringIO(
+            ('test_data\n'
+             '0\n'
+             '1\n'
+             '2\n'))
+        f = EmbedFactory(None)
+        assert f._count_txt_file_lines(txt) == 4
 
-def test__count_txt_file_lines():
-    assert _count_txt_file_lines(txt) == 11
+    def test__create_batch_gen(self):
+        expected = []
+        p = os.path.join(os.path.dirname(__file__), 'test_data.csv')
+        f = EmbedFactory(None)
+        for a in f._create_batch_gen(p, 3):
+            for aa in a.iloc[:, 0]:
+                expected.append(aa)
+        assert list(range(0, 10)) == sorted(expected)
 
+    def test_create_betch_gen(self):
+        m, _create_batch_gen = MagicMock(), MagicMock(
+            return_value=[pd.DataFrame([['a'], ['b']])])
+        m.vectorize = lambda txt: [0, 1] if txt == 'a' else [1, 0]
+        f = EmbedFactory(m)
 
-def test__create_batch_gen():
-    expected = []
-    p = os.path.join(os.path.dirname(__file__), 'test_data.csv')
-    for a in create_batch_gen(p, 3):
-        for aa in a.iloc[:, 0]:
-            expected.append(aa)
-    assert list(range(0, 10)) == sorted(expected)
+        f._create_batch_gen = _create_batch_gen
+        res = list(f.create_batch_gen(None, None))[0]
+        assert (res == pd.DataFrame([[0, 1],
+                                     [1, 0]])).all().all()
