@@ -38,5 +38,5 @@ class EmbedFactory(object):
 
         for txt_df in self._create_batch_gen(src, batch_size):
             yield pd.DataFrame(
-                [self.vectorizer.vectorize(txt) for txt
-                 in txt_df.iloc[:, 0]])
+                [[r[0], r[1]] + self.vectorizer.vectorize(r[2]) for k, r
+                 in txt_df.iterrows()])
