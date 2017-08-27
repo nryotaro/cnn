@@ -23,9 +23,10 @@ def test__count_txt_file_lines():
     assert _count_txt_file_lines(txt) == 11
 
 
-@patch('numpy.random.permutation')
-def test__create_batch_gen(m):
-    m.side_effect = lambda *x: [1, 3, 5, 7, 9, 2, 4, 6, 8, 10]
+def test__create_batch_gen():
+    expected = []
     p = os.path.join(os.path.dirname(__file__), 'test_data.csv')
-    list(create_batch_gen(p, 3))
-    assert False
+    for a in create_batch_gen(p, 3):
+        for aa in a.iloc[:, 0]:
+            expected.append(aa)
+    assert list(range(0, 10)) == sorted(expected)

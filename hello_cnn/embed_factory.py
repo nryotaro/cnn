@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
+import sklearn.utils as sk
 
 
 def _count_txt_file_lines(src):
@@ -29,8 +30,6 @@ def create_batch_gen(src, batch_size):
     indices = np.random.permutation(range(1, data_size))
 
     for chunk in _chunks(indices, batch_size):
-        print(chunk)
         res = pd.read_csv(src, skiprows=lambda n: n not in chunk,
                           header=None)
-        print(res)
-        yield res
+        yield sk.shuffle(res)
