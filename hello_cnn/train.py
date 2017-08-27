@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import hello_cnn.embed_factory as fac
 import hello_cnn.vectorizer as vec
+import hello_cnn.cnn as txt_cnn
 import tensorflow as tf
 import os
 import time
@@ -29,18 +30,15 @@ tf.flags.DEFINE_boolean(
 tf.flags.DEFINE_boolean(
     "log_device_placement", False,
     "Log placement of ops on devices")
-tf.flags.DEFINE_boolean(
-    "log_device_placement", False,
-    "Log placement of ops on devices")
-tf.flags.DEFINE_string(
-    "w2v_model", '../data/GoogleNews-vectors-negative300.bin',
-    "The path of a Word2Vec model")
 tf.flags.DEFINE_string(
     "train_data", '../data/train.csv',
     "a csv file of training data")
 tf.flags.DEFINE_string(
     "test_data", '../data/test.csv',
     "a csv file for test")
+tf.flags.DEFINE_string(
+    "w2v_model", '../data/GoogleNews-vectors-negative300.bin',
+    "The path of a Word2Vec model")
 
 
 FLAGS = tf.flags.FLAGS
@@ -48,28 +46,13 @@ FLAGS._parse_flags()
 
 
 embed_factory = fac.EmbedFactory(
-    vec.build_vectorizer(FLAGS.v2v_model))
+    vec.build_vectorizer(FLAGS.w2v_model))
 
 
 def create_epoc_batch(src, batch_size, num_epochs):
     for _ in range(num_epochs):
         for batch_df in embed_factory.create_batch_gen(src, batch_size):
             yield batch_df
-
-
-class Cnn(object):
-    """
-    TODO:
-        summary
-        checkpoint
-
-    Properties:
-        loss
-        accuracy
-    """
-    def __init__(self):
-
-        pass
 
 
 def read_test_data(src):
@@ -98,7 +81,7 @@ def train():
         sess = tf.Session(config=session_conf)
 
         with sess.as_default():
-            cnn = Cnn()
+            cnn = txt_cnn.Cnn()
             # Define Training procedure
             # global_step refer to the number of batches seen by the graph.
             # Everytime a batch is provided,
