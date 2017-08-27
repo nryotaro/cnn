@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 
+
+def _count_txt_file_lines(src):
+
+    def count(f):
+        return sum(1 for line in f)
+
+    if isinstance(src, str):
+        with open(src, 'r') as f:
+            return count(f)
+
+    return count(src)
+
+
+def create_batch_gen(src, batch_size):
+    pass
+
 """
 def create_batch_iter(data, batch_size, num_epochs, shuffle=True):
     data = np.array(data)
