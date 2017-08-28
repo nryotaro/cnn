@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import hello_cnn.embed_factory as fac
+import hello_cnn.embed_factory as e_fac
 import hello_cnn.vectorizer as vec
 import hello_cnn.cnn as txt_cnn
+import hello_cnn.label_factory as l_fac
 import tensorflow as tf
 import os
 import time
@@ -37,6 +38,9 @@ tf.flags.DEFINE_string(
     "test_data", '../data/test.csv',
     "a csv file for test")
 tf.flags.DEFINE_string(
+    "data", '../data/data.csv',
+    "a csv file of data")
+tf.flags.DEFINE_string(
     "w2v_model", '../data/GoogleNews-vectors-negative300.bin',
     "The path of a Word2Vec model")
 
@@ -45,27 +49,22 @@ FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 
 
-embed_factory = fac.EmbedFactory(
-    vec.build_vectorizer(FLAGS.w2v_model))
 
-
-def create_epoc_batch(src, batch_size, num_epochs):
-    """
-    An epoch is one forward pass and
-    one backward pass of all training examples.
-    """
-    for _ in range(num_epochs):
-        for batch_df in embed_factory.create_batch_gen(src, batch_size):
-            yield batch_df
 
 
 def read_test_data(src):
     df = pd.read_csv(src)
-    return df.iloc[:, 2:], df.iloc[:, 1]
+    return df.iloc[:, 2], df.iloc[:, 1]
 
 
 def train():
+    # FIXME
     x_test, y_test = read_test_data(FLAGS.test_data)
+
+    embed_factory = fac.EmbedFactory(
+        vec.build_vectorizer(FLAGS.w2v_model))
+
+    label_binarizer = l_fac.create_label_binarizer(FLAGS.data, 1)
 
     with tf.Graph().as_default():
 
@@ -195,10 +194,8 @@ def train():
 
             # Generate batches
             # Training loop. For each batch...
-            for batch in create_epoc_batch(FLAGS.create_epoc_batch(
-                    FLAGS.train_data,
-                    FLAGS.batch_size,
-                    FLAGS.num_epochs)):
+            for batch in embed_factory.create_epoch_batch_gen(
+                    FLAGS.train_data, FLAGS.batch_size, FLAGS.num_epochs):
                 x_batch, y_batch = batch.iloc[:, 2:], batch.iloc[:, 1]
                 train_step(x_batch, y_batch)
                 current_step = tf.train.global_step(sess, global_step)
