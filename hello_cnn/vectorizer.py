@@ -40,6 +40,10 @@ class Vectorizer(object):
         return np.concatenate((matrix, pad), axis=0)
 
     def vectorize(self, txt):
+        """
+        Returns:
+            text represented as 2-dimentional numpy.array
+        """
         ary = np.array(self._to_word_matrix(self._to_alphabet_word_list(txt)))
         return self._padding(ary)
 

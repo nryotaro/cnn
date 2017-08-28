@@ -37,6 +37,7 @@ class EmbedFactory(object):
     def create_batch_gen(self, src, batch_size):
 
         for txt_df in self._create_batch_gen(src, batch_size):
-            yield pd.DataFrame(
-                [[r[0], r[1]] + self.vectorizer.vectorize(r[2]) for k, r
-                 in txt_df.iterrows()])
+            yield [{'id': r[0],
+                   'label': r[1],
+                    'text': self.vectorizer.vectorize(r[2])} for k, r
+                   in txt_df.iterrows()]
