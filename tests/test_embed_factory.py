@@ -50,10 +50,22 @@ class TestEmbedFactory(object):
 
         res = list(f.create_batch_gen(test_data_path, 2))
 
-        print(res)
         assert len(res) == 5
         assert [len(e) for e in res] == [2, 2, 2, 2, 2]
         assert res[0][0]['id'] in range(0, 10)
         assert res[0][0]['label'] in ['a', 'b', 'c', 'd', 'e', 'f',
                                       'g', 'h', 'i', 'j']
         assert (res[0][0]['text'] == np.array([[0, 1]])).all()
+
+    def test_create_epoch_batch_gen(self):
+        m = MagicMock()
+        m.vectorize = lambda txt: np.array([[0, 1]])
+        f = EmbedFactory(m)
+
+        res = list(f.create_epoch_batch_gen(test_data_path, 2, 4))
+
+        assert len(res) == 20, \
+            ('The size of data is 10, batch size is 2, epoch size is 4, '
+             'so it yields 20 elements.')
+
+        assert len(res[0]) == 2, 'The size of each element is batch size'

@@ -41,3 +41,12 @@ class EmbedFactory(object):
                    'label': r[1],
                     'text': self.vectorizer.vectorize(r[2])} for k, r
                    in txt_df.iterrows()]
+
+    def create_epoch_batch_gen(self, src, batch_size, num_epochs):
+        """
+        An epoch is one forward pass and
+        one backward pass of all training examples.
+        """
+        for _ in range(num_epochs):
+            for batch in self.create_batch_gen(src, batch_size):
+                yield batch

@@ -50,6 +50,10 @@ embed_factory = fac.EmbedFactory(
 
 
 def create_epoc_batch(src, batch_size, num_epochs):
+    """
+    An epoch is one forward pass and
+    one backward pass of all training examples.
+    """
     for _ in range(num_epochs):
         for batch_df in embed_factory.create_batch_gen(src, batch_size):
             yield batch_df
