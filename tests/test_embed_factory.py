@@ -2,8 +2,12 @@
 from hello_cnn.embed_factory import EmbedFactory
 from io import StringIO
 import os
-import pandas as pd
+import numpy as np
 from unittest.mock import MagicMock
+
+
+test_data_path = os.path.join(
+    os.path.dirname(__file__), 'test_data.csv')
 
 
 class TestEmbedFactory(object):
@@ -19,38 +23,37 @@ class TestEmbedFactory(object):
 
     def test__create_batch_gen(self):
         expected = []
-        p = os.path.join(os.path.dirname(__file__), 'test_data.csv')
+
         f = EmbedFactory(None)
 
-        for a in f._create_batch_gen(p, 3):
+        for a in f._create_batch_gen(test_data_path, 3):
             for k, r in a.iterrows():
                 assert len(r) == 3
                 expected.append((r[0], r[1], r[2]))
 
         sorted(expected, key=lambda r: r[0]) == [
-            (0, 'a', 10),
-            (1, 'b', 11),
-            (2, 'c', 22),
-            (3, 'd', 33),
-            (4, 'e', 44),
-            (5, 'f', 55),
-            (6, 'g', 66),
-            (7, 'h', 77),
-            (8, 'i', 88),
-            (9, 'j', 99)]
+            (0, 'a', 'aa'),
+            (1, 'b', 'bb'),
+            (2, 'c', 'cc'),
+            (3, 'd', 'dd'),
+            (4, 'e', 'ee'),
+            (5, 'f', 'ff'),
+            (6, 'g', 'gg'),
+            (7, 'h', 'hh'),
+            (8, 'i', 'ii'),
+            (9, 'j', 'jj')]
 
     def test_create_betch_gen(self):
-        m, _create_batch_gen = MagicMock(), MagicMock(
-            return_value=[pd.DataFrame([['001', 'aaa', 'a'],
-                                        ['002', 'bbb', 'b']])])
-        m.vectorize = lambda txt: [[0, 1]] if txt == 'a' else [[1, 0]]
+        m = MagicMock()
+        m.vectorize = lambda txt: np.array([[0, 1]])
         f = EmbedFactory(m)
 
-        f._create_batch_gen = _create_batch_gen
-
-        res = list(f.create_batch_gen(None, None))[0]
+        res = list(f.create_batch_gen(test_data_path, 2))
 
         print(res)
-        assert res['id'] == '001'
-        assert res['label'] == 'aaa'
-        assert (res['text'] == pd.DataFrame([[0, 1], [1, 0]])).all().all()
+        assert len(res) == 5
+        assert [len(e) for e in res] == [2, 2, 2, 2, 2]
+        assert res[0][0]['id'] in range(0, 10)
+        assert res[0][0]['label'] in ['a', 'b', 'c', 'd', 'e', 'f',
+                                      'g', 'h', 'i', 'j']
+        assert (res[0][0]['text'] == np.array([[0, 1]])).all()
