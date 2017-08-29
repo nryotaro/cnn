@@ -4,6 +4,7 @@ from io import StringIO
 import os
 import numpy as np
 from unittest.mock import MagicMock
+import pprint as pp
 
 
 test_data_path = os.path.join(
@@ -49,13 +50,12 @@ class TestEmbedFactory(object):
         f = EmbedFactory(m)
 
         res = list(f.create_batch_gen(test_data_path, 2))
-
+        pp.pprint(res)
         assert len(res) == 5
         assert [len(e) for e in res] == [2, 2, 2, 2, 2]
-        assert res[0][0]['id'] in range(0, 10)
-        assert res[0][0]['label'] in ['a', 'b', 'c', 'd', 'e', 'f',
-                                      'g', 'h', 'i', 'j']
-        assert (res[0][0]['text'] == np.array([[0, 1]])).all()
+        assert res[0][0][0] \
+            in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
+        assert (res[0][1][0] == np.array([[0, 1]])).all()
 
     def test_create_epoch_batch_gen(self):
         m = MagicMock()
@@ -69,3 +69,7 @@ class TestEmbedFactory(object):
              'so it yields 20 elements.')
 
         assert len(res[0]) == 2, 'The size of each element is batch size'
+
+        for x, y in f.create_epoch_batch_gen(test_data_path, 2, 4):
+            x  # e.g., ('a', 'b')
+            y  # e.g., (array([[0, 1]]), array([[0, 1]]))

@@ -37,15 +37,19 @@ class EmbedFactory(object):
     def create_batch_gen(self, src, batch_size):
 
         for txt_df in self._create_batch_gen(src, batch_size):
-            yield [{'id': r[0],
-                   'label': r[1],
-                    'text': self.vectorizer.vectorize(r[2])} for k, r
-                   in txt_df.iterrows()]
+            batch = [(r[1], self.vectorizer.vectorize(r[2])) for k, r
+                     in txt_df.iterrows()]
+            x, y = zip(*batch)
+            yield x, y
 
     def create_epoch_batch_gen(self, src, batch_size, num_epochs):
         """
         An epoch is one forward pass and
         one backward pass of all training examples.
+
+        for x, y in f.create_epoch_batch_gen(test_data_path, 2, 4):
+            x  # e.g., ('a', 'b')
+            y  # e.g., (array([[0, 1]]), array([[0, 1]]))
         """
         for _ in range(num_epochs):
             for batch in self.create_batch_gen(src, batch_size):

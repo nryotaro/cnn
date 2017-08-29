@@ -49,19 +49,20 @@ FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 
 
-
-
-
 def read_test_data(src):
     df = pd.read_csv(src)
     return df.iloc[:, 2], df.iloc[:, 1]
+
+
+def binarize(binarizer, labels):
+    return binarizer.transform(labels)
 
 
 def train():
     # FIXME
     x_test, y_test = read_test_data(FLAGS.test_data)
 
-    embed_factory = fac.EmbedFactory(
+    embed_factory = e_fac.EmbedFactory(
         vec.build_vectorizer(FLAGS.w2v_model))
 
     label_binarizer = l_fac.create_label_binarizer(FLAGS.data, 1)
@@ -194,10 +195,9 @@ def train():
 
             # Generate batches
             # Training loop. For each batch...
-            for batch in embed_factory.create_epoch_batch_gen(
+            for x_batch, y_batch in embed_factory.create_epoch_batch_gen(
                     FLAGS.train_data, FLAGS.batch_size, FLAGS.num_epochs):
-                x_batch, y_batch = batch.iloc[:, 2:], batch.iloc[:, 1]
-                train_step(x_batch, y_batch)
+                train_step(x_batch, binarize(label_binarizer, y_batch))
                 current_step = tf.train.global_step(sess, global_step)
                 if current_step % FLAGS.evaluate_every == 0:
                     print("\nEvaluation:")
