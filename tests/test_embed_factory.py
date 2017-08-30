@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from hello_cnn.embed_factory import EmbedFactory
+import tensorflow as tf
 from io import StringIO
 import os
 import numpy as np
@@ -53,9 +54,9 @@ class TestEmbedFactory(object):
         pp.pprint(res)
         assert len(res) == 5
         assert [len(e) for e in res] == [2, 2, 2, 2, 2]
-        assert res[0][0][0] \
+        assert res[0][1][0] \
             in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
-        assert (res[0][1][0] == np.array([[0, 1]])).all()
+        assert (res[0][0][0] == np.array([[0, 1]])).all()
 
     def test_create_epoch_batch_gen(self):
         m = MagicMock()
@@ -70,6 +71,12 @@ class TestEmbedFactory(object):
 
         assert len(res[0]) == 2, 'The size of each element is batch size'
 
+        embedding_size, text_length = 2, 1
+        input_x = tf.placeholder(tf.int32,
+                                 [None, text_length, embedding_size],
+                                 name='input_x')
+        sess = tf.Session()
         for x, y in f.create_epoch_batch_gen(test_data_path, 2, 4):
-            x  # e.g., ('a', 'b')
-            y  # e.g., (array([[0, 1]]), array([[0, 1]]))
+            x  # e.g., (array([[0, 1]]), array([[0, 1]]))
+            y  # e.g., ('a', 'b')
+            sess.run(input_x, {input_x: x})

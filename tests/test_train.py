@@ -7,4 +7,6 @@ def test_binarize():
     labels = ('a', 'b', 'c')
     bin = LabelBinarizer().fit(labels)
     res = binarize(bin, labels)
-    assert (res == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]).all()
+    assert (res == [[1, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 1]]).all()
