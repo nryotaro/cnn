@@ -55,6 +55,13 @@ def read_test_data(src):
 
 
 def binarize(binarizer, labels):
+    """
+    Returns:
+        It can be feeded to the below placeholder.
+
+        input_y = tf.placeholder(
+            tf.float32, [None, num_classes], name="input_y")
+    """
     return binarizer.transform(labels)
 
 
