@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from hello_cnn.train import train
+import hello_cnn.train
 
 
 def main():
-
-    train()
+    pass

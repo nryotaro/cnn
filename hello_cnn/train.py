@@ -49,9 +49,11 @@ FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 
 
-def read_test_data(src):
+def read_test_data(src, binarizer, vectorizer):
     df = pd.read_csv(src)
-    return df.iloc[:, 2], df.iloc[:, 1]
+    x = df.iloc[:, 2].map(vectorizer.vectorize)
+    y = binarize(binarizer, df.iloc[:, 1])
+    return x, y
 
 
 def binarize(binarizer, labels):

@@ -5,6 +5,12 @@ import sklearn.utils as sk
 
 
 class EmbedFactory(object):
+    """
+    TODO:
+        Rename the class because it delegates
+        creating word embedding to Vectorizer
+
+    """
 
     def __init__(self, vectorizer):
         self.vectorizer = vectorizer
