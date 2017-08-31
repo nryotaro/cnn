@@ -1,3 +1,4 @@
+# /usr/bin/env python
 # -*- coding: utf-8 -*-
 import hello_cnn.embed_factory as e_fac
 import hello_cnn.vectorizer as vec
@@ -68,13 +69,11 @@ def binarize(binarizer, labels):
 
 
 def train():
-    # FIXME
-    x_test, y_test = read_test_data(FLAGS.test_data)
-
-    embed_factory = e_fac.EmbedFactory(
-        vec.build_vectorizer(FLAGS.w2v_model))
-
+    vectorizer = vec.build_vectorizer(FLAGS.w2v_model)
+    embed_factory = e_fac.EmbedFactory(vectorizer)
     label_binarizer = l_fac.create_label_binarizer(FLAGS.data, 1)
+    x_test, y_test = read_test_data(
+        FLAGS.test_data, label_binarizer, vectorizer)
 
     with tf.Graph().as_default():
 
@@ -217,3 +216,11 @@ def train():
                         path = saver.save(
                             sess, checkpoint_prefix, global_step=current_step)
                         print("Saved model checkpoint to {}\n".format(path))
+
+
+def main():
+    train()
+
+
+if __name__ == '__main__':
+    tf.app.run()
