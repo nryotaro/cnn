@@ -45,7 +45,7 @@ class TestVectorizer(object):
         assert (a == np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])).all()
 
 
-@patch('gensim.models.Word2Vec.load_word2vec_format')
+@patch('gensim.models.KeyedVectors.load_word2vec_format')
 def test_build_vectorizer(m):
     build_vectorizer('model_path')
     m.assert_called_once()

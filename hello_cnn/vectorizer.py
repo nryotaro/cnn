@@ -50,6 +50,6 @@ class Vectorizer(object):
 
 
 def build_vectorizer(model_path: str):
-    model = gensim.models.Word2Vec.load_word2vec_format(
+    model = gensim.models.KeyedVectors.load_word2vec_format(
         model_path, binary=True)
     return Vectorizer(model)
