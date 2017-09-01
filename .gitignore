@@ -2,6 +2,8 @@
 runs
 # data directory
 data
+# notebook
+notebooks/hello_cnn.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

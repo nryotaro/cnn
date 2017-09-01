@@ -9,11 +9,13 @@ import os
 import time
 import datetime
 import pandas as pd
+import numpy as np
 
 
 def read_test_data(src, binarizer, vectorizer):
     df = pd.read_csv(src)
-    x = df.iloc[:, 2].map(vectorizer.vectorize)
+    x = np.array([text_vec for text_vec
+                  in df.iloc[:, 2].map(vectorizer.vectorize)])
     y = binarize(binarizer, df.iloc[:, 1])
     return x, y
 
@@ -171,8 +173,11 @@ def train(FLAGS):
             # Training loop. For each batch...
             for x_batch, y_batch in embed_factory.create_epoch_batch_gen(
                     FLAGS.train_data, FLAGS.batch_size, FLAGS.num_epochs):
+
                 train_step(x_batch, binarize(label_binarizer, y_batch))
+
                 current_step = tf.train.global_step(sess, global_step)
+
                 if current_step % FLAGS.evaluate_every == 0:
                     print("\nEvaluation:")
                     dev_step(x_test, y_test, writer=dev_summary_writer)
