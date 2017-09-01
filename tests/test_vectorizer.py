@@ -25,14 +25,35 @@ class TestVectorizer(object):
         a = vec._to_word_matrix(['the', 'quick', 'fox'])
         assert a == [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
+    def test__to_word_matrix_return_empty_list(self):
+        m = {}
+        vec = Vectorizer(m)
+        assert [] == vec._to_word_matrix(['the', 'quick', 'fox'])
+
     def test__padding(self):
         m = MagicMock()
         m.vector_size = 3
         vec = Vectorizer(m, length=5)
 
-        a = vec._padding(
+        result = vec._padding(
             np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
-        assert a.shape == (5, 3)
+
+        assert (result == np.array([[1, 2, 3],
+                                    [4, 5, 6],
+                                    [7, 8, 9],
+                                    [0, 0, 0],
+                                    [0, 0, 0]])).all()
+
+    def test__padding_empty_array(self):
+        m = MagicMock()
+        m.vector_size = 3
+        vec = Vectorizer(m, length=5)
+        result = vec._padding(np.array([]))
+        assert (result == np.array([[0, 0, 0],
+                                    [0, 0, 0],
+                                    [0, 0, 0],
+                                    [0, 0, 0],
+                                    [0, 0, 0]])).all()
 
     def test__padding_filled(self):
         m = MagicMock()

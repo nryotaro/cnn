@@ -13,6 +13,13 @@ import pandas as pd
 
 def read_test_data(src, binarizer, vectorizer):
     df = pd.read_csv(src)
+    """
+    print(df)
+    print('!!!')
+    print(type(vectorizer))
+    print('--@--')
+    print(df.iloc[:, 2])
+    """
     x = df.iloc[:, 2].map(vectorizer.vectorize)
     y = binarize(binarizer, df.iloc[:, 1])
     return x, y

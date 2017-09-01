@@ -21,30 +21,34 @@ class Vectorizer(object):
                      and word.lower() not in stop_words))
 
     def _to_word_matrix(self, words):
+        """
+
+        Returns:
+            an empty 1-dim list if all the given words can't be vectorized.
+        """
         vectorizable_words = list(filter(
             lambda word: word in self.model, words))[0:self.length]
 
         return [self.model[word] for word in vectorizable_words]
 
     def _padding(self, matrix):
+
+        if matrix.shape[0] == 0:
+            return np.zeros((self.length, self.model.vector_size))
+
         padding_length = self.length - matrix.shape[0]
 
         if padding_length <= 0:
             return matrix
-
-        mu = np.mean(matrix, axis=0)
-        std = np.std(matrix, axis=0)
-
-        pad = np.random.normal(
-            mu, std, [padding_length, self.model.vector_size])
-
-        return np.concatenate((matrix, pad), axis=0)
+        return np.pad(matrix, ((0, padding_length), (0, 0)),
+                      'constant', constant_values=0)
 
     def vectorize(self, txt):
         """
         Returns:
             text represented as 2-dimentional numpy.array
         """
+        print('txt-> ', txt)
         ary = np.array(self._to_word_matrix(self._to_alphabet_word_list(txt)))
         return self._padding(ary)
 
