@@ -48,7 +48,6 @@ class Vectorizer(object):
         Returns:
             text represented as 2-dimentional numpy.array
         """
-        print('txt-> ', txt)
         ary = np.array(self._to_word_matrix(self._to_alphabet_word_list(txt)))
         return self._padding(ary)
 
