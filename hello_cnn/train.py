@@ -11,45 +11,6 @@ import datetime
 import pandas as pd
 
 
-# Training parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer(
-    "num_epochs", 200,
-    "Number of training epochs (default: 200)")
-tf.flags.DEFINE_integer(
-    "evaluate_every", 100,
-    "Evaluate model on dev set after this many steps (default: 100)")
-tf.flags.DEFINE_integer(
-    "num_checkpoints", 5,
-    "Number of checkpoints to store (default: 5)")
-tf.flags.DEFINE_integer(
-    "checkpoint_every", 100,
-    "Save model after this many steps (default: 100)")
-# Misc Parameters
-tf.flags.DEFINE_boolean(
-    "allow_soft_placement", True,
-    "Allow device soft device placement")
-tf.flags.DEFINE_boolean(
-    "log_device_placement", False,
-    "Log placement of ops on devices")
-tf.flags.DEFINE_string(
-    "train_data", '../data/train.csv',
-    "a csv file of training data")
-tf.flags.DEFINE_string(
-    "test_data", '../data/test.csv',
-    "a csv file for test")
-tf.flags.DEFINE_string(
-    "data", '../data/data.csv',
-    "a csv file of data")
-tf.flags.DEFINE_string(
-    "w2v_model", '../data/GoogleNews-vectors-negative300.bin',
-    "The path of a Word2Vec model")
-
-
-FLAGS = tf.flags.FLAGS
-FLAGS._parse_flags()
-
-
 def read_test_data(src, binarizer, vectorizer):
     df = pd.read_csv(src)
     x = df.iloc[:, 2].map(vectorizer.vectorize)
@@ -68,7 +29,7 @@ def binarize(binarizer, labels):
     return binarizer.transform(labels)
 
 
-def train():
+def train(FLAGS):
     vectorizer = vec.build_vectorizer(FLAGS.w2v_model)
     embed_factory = e_fac.EmbedFactory(vectorizer)
     label_binarizer = l_fac.create_label_binarizer(FLAGS.data, 1)
@@ -218,8 +179,46 @@ def train():
                         print("Saved model checkpoint to {}\n".format(path))
 
 
-def main():
-    train()
+def main(argv):
+
+    dir = os.path.dirname(__file__) + '/../data'
+    # Training parameters
+    tf.flags.DEFINE_integer(
+        "num_epochs", 200,
+        "Number of training epochs (default: 200)")
+    tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+    tf.flags.DEFINE_integer(
+        "evaluate_every", 100,
+        "Evaluate model on dev set after this many steps (default: 100)")
+    tf.flags.DEFINE_integer(
+        "num_checkpoints", 5,
+        "Number of checkpoints to store (default: 5)")
+    tf.flags.DEFINE_integer(
+        "checkpoint_every", 100,
+        "Save model after this many steps (default: 100)")
+    # Misc Parameters
+    tf.flags.DEFINE_boolean(
+        "allow_soft_placement", True,
+        "Allow device soft device placement")
+    tf.flags.DEFINE_boolean(
+        "log_device_placement", False,
+        "Log placement of ops on devices")
+    tf.flags.DEFINE_string(
+        "train_data", f'{dir}/train.csv',
+        "a csv file of training data")
+    tf.flags.DEFINE_string(
+        "test_data", f'{dir}/test.csv',
+        "a csv file for test")
+    tf.flags.DEFINE_string(
+        "data", f'{dir}/data.csv',
+        "a csv file of data")
+    tf.flags.DEFINE_string(
+        "w2v_model", f'{dir}/GoogleNews-vectors-negative300.bin',
+        "The path of a Word2Vec model")
+
+    FLAGS = tf.flags.FLAGS
+    FLAGS._parse_flags()
+    train(FLAGS)
 
 
 if __name__ == '__main__':

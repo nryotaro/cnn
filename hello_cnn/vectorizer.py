@@ -3,6 +3,7 @@ import re
 import numpy as np
 from nltk.tokenize import TweetTokenizer
 from hello_cnn.stop_words import stop_words
+import gensim
 
 
 class Vectorizer(object):
@@ -48,5 +49,7 @@ class Vectorizer(object):
         return self._padding(ary)
 
 
-def build_vectorizer(model_path):
-    return Vectorizer(model_path)
+def build_vectorizer(model_path: str):
+    model = gensim.models.Word2Vec.load_word2vec_format(
+        model_path, binary=True)
+    return Vectorizer(model)
