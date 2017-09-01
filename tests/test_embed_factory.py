@@ -60,7 +60,7 @@ class TestEmbedFactory(object):
 
     def test_create_epoch_batch_gen(self):
         m = MagicMock()
-        m.vectorize = lambda txt: np.array([[0, 1]])
+        m.vectorize = lambda txt: np.array([[0.0, 1.1]])
         f = EmbedFactory(m)
 
         res = list(f.create_epoch_batch_gen(test_data_path, 2, 4))
@@ -72,7 +72,7 @@ class TestEmbedFactory(object):
         assert len(res[0]) == 2, 'The size of each element is batch size'
 
         embedding_size, text_length = 2, 1
-        input_x = tf.placeholder(tf.int32,
+        input_x = tf.placeholder(tf.float32,
                                  [None, text_length, embedding_size],
                                  name='input_x')
         sess = tf.Session()
