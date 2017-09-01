@@ -17,7 +17,7 @@ class Cnn(object):
         accuracy
     """
     def __init__(
-      self, sequence_length, num_classes, vocab_size,
+      self, sequence_length, num_classes,
       embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
         """
         Args:

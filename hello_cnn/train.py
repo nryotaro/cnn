@@ -13,13 +13,6 @@ import pandas as pd
 
 def read_test_data(src, binarizer, vectorizer):
     df = pd.read_csv(src)
-    """
-    print(df)
-    print('!!!')
-    print(type(vectorizer))
-    print('--@--')
-    print(df.iloc[:, 2])
-    """
     x = df.iloc[:, 2].map(vectorizer.vectorize)
     y = binarize(binarizer, df.iloc[:, 1])
     return x, y
@@ -61,10 +54,15 @@ def train(FLAGS):
         sess = tf.Session(config=session_conf)
 
         with sess.as_default():
-            cnn = txt_cnn.Cnn()
+            cnn = txt_cnn.Cnn(
+                sequence_length=vectorizer.length,
+                num_classes=label_binarizer.classes_.shape[0],
+                embedding_size=vectorizer.embedding_size,
+                filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
+                num_filters=FLAGS.num_filters)
             # Define Training procedure
             # global_step refer to the number of batches seen by the graph.
-            # Everytime a batch is provided,
+            # Everytime a batcnh is provided,
             # the weights are updated in the direction that minimizes the loss.
             # global_step just keeps track of the number of batches seen so far
             global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -203,6 +201,13 @@ def main(argv):
     tf.flags.DEFINE_integer(
         "checkpoint_every", 100,
         "Save model after this many steps (default: 100)")
+    # Model Hyperparameters
+    tf.flags.DEFINE_integer(
+        "num_filters", 128,
+        "Number of filters per filter size (default: 128)")
+    tf.flags.DEFINE_string(
+        "filter_sizes", "3,4,5",
+        "Comma-separated filter sizes (default: '3,4,5')")
     # Misc Parameters
     tf.flags.DEFINE_boolean(
         "allow_soft_placement", True,

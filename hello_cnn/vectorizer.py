@@ -10,10 +10,18 @@ class Vectorizer(object):
 
     def __init__(self, model, length=200, tokenizer=TweetTokenizer(),
                  alphabet_pattern=re.compile('^[a-zA-Z]+$')):
+        """
+        Args:
+            length: number of rows
+        """
         self.model = model
         self.tokenizer = tokenizer
         self.alphabet_pattern = alphabet_pattern
         self.length = length
+
+    @property
+    def embedding_size(self):
+        return self.model.vector_size
 
     def _to_alphabet_word_list(self, txt):
         return list((word.lower() for word in self.tokenizer.tokenize(txt)
